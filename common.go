@@ -33,6 +33,7 @@ type commonState struct {
 	maxRows           int
 	shouldRestart     ShouldRestart
 	needRefresh       bool
+	handlers          map[rune]func() error
 }
 
 // TabStyle is used to select how tab completions are displayed.
@@ -74,6 +75,12 @@ const KillRingMax = 60
 
 // HistoryLimit is the maximum number of entries saved in the scrollback history.
 const HistoryLimit = 1000
+
+//RegisterHandler is used to register a handler for when a specific key is pressed. This function will be called on key press
+func (s *State) RegisterHandler(key rune, handler func() error) error {
+	s.handlers[key] = handler
+	return nil
+}
 
 // ReadHistory reads scrollback history from r. Returns the number of lines
 // read, and any read error (except io.EOF).

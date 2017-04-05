@@ -65,6 +65,7 @@ func NewLiner() *State {
 		s.outputRedirected = !s.getColumns()
 	}
 
+	s.handlers = make(map[rune]func() error)
 	return &s
 }
 
@@ -94,7 +95,8 @@ func (s *State) restartPrompt() {
 			n.r, _, n.err = s.r.ReadRune()
 			next <- n
 			// Shut down nexter loop when an end condition has been reached
-			if n.err != nil || n.r == '\n' || n.r == '\r' || n.r == ctrlC || n.r == ctrlD {
+			if n.err != nil || n.r == '\n' || n.r == '\r' {
+				// if n.err != nil || n.r == '\n' || n.r == '\r' || n.r == ctrlC || n.r == ctrlD {
 				close(next)
 				return
 			}

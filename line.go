@@ -646,6 +646,16 @@ mainLoop:
 		historyAction = false
 		switch v := next.(type) {
 		case rune:
+			if handler, ok := s.handlers[v]; ok {
+				// log.Println("had handler")
+				// fmt.Print(prompt)
+				handler()
+				// s.restartPrompt()
+				// fmt.Println()
+				continue
+			}
+			// log.Println(v)
+			// continue
 			switch v {
 			case cr, lf:
 				if s.needRefresh {
