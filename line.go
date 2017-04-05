@@ -358,7 +358,7 @@ func (s *State) tabComplete(p []rune, line []rune, pos int) ([]rune, int, interf
 	hl := utf8.RuneCountInString(head)
 	if len(list) == 1 {
 		err := s.refresh(p, []rune(head+list[0]+tail), hl+utf8.RuneCountInString(list[0]))
-		return []rune(head + list[0] + tail), hl + utf8.RuneCountInString(list[0]), rune(esc), err
+		return []rune(head + list[0] + tail), hl + utf8.RuneCountInString(list[0]), rune(' '), err
 	}
 
 	direction := tabForward
@@ -370,16 +370,16 @@ func (s *State) tabComplete(p []rune, line []rune, pos int) ([]rune, int, interf
 	for {
 		pick, err := tabPrinter(direction)
 		if err != nil {
-			return line, pos, rune(esc), err
+			return line, pos, rune(' '), err
 		}
 		err = s.refresh(p, []rune(head+pick+tail), hl+utf8.RuneCountInString(pick))
 		if err != nil {
-			return line, pos, rune(esc), err
+			return line, pos, rune(' '), err
 		}
 
 		next, err := s.readNext()
 		if err != nil {
-			return line, pos, rune(esc), err
+			return line, pos, rune(' '), err
 		}
 		if key, ok := next.(rune); ok {
 			if key == tab {
@@ -647,11 +647,7 @@ mainLoop:
 		switch v := next.(type) {
 		case rune:
 			if handler, ok := s.handlers[v]; ok {
-				// log.Println("had handler")
-				// fmt.Print(prompt)
 				handler()
-				// s.restartPrompt()
-				// fmt.Println()
 				continue
 			}
 			// log.Println(v)
@@ -855,6 +851,7 @@ mainLoop:
 			case tab: // Tab completion
 				line, pos, next, err = s.tabComplete(p, line, pos)
 				goto haveNext
+				// fallthrough
 			// Catch keys that do nothing, but you don't want them to beep
 			case esc:
 				// DO NOTHING
